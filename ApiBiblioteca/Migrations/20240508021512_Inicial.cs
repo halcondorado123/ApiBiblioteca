@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore.Migrations;
+﻿using System;
+using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
@@ -14,14 +15,15 @@ namespace ApiBiblioteca.Migrations
                 name: "LibrosME",
                 columns: table => new
                 {
-                    IDLibro = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    NombreAutor = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    ApellidoAutor = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    IDLibro = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    FechaRegistro = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    NombreAutor = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    ApellidoAutor = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Tematica = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    TituloLibro = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    TituloLibro = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Lugar = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Editorial = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                    Editorial = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Disponible = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
                 {

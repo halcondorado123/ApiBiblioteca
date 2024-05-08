@@ -1,4 +1,7 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using ApiBiblioteca.Data;
+using ApiBiblioteca.Models;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace ApiBiblioteca.Controllers
 {
@@ -6,52 +9,172 @@ namespace ApiBiblioteca.Controllers
     [Route("[controller]")]
     public class LibrosController : Controller
     {
-        public LibrosController()
-        {
+        private readonly LibrosDbContext _dbContext;
 
+        public LibrosController(LibrosDbContext dbContext)
+        {
+            _dbContext = dbContext;
         }
 
-        [HttpGet]
-        public async Task<IActionResult> Obtener()
+        [HttpGet("Libros")]
+        public List<LibrosME> ObtenerLibros()
         {
-            await Task.CompletedTask;
-            return Ok();
+            List<LibrosME> libros = new List<LibrosME>();
+
+            try
+            {
+                libros = _dbContext.LibrosME.ToList();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+
+            return libros;
         }
 
-        //[HttpGet]
-        //public async Task<IActionResult> ObtenerPorId()
-        //{
-        //    await Task.CompletedTask;
-        //    return Ok();
-        //}
 
-        //[HttpGet]
-        //public async Task<IActionResult> ObtenerPorTematica()
-        //{
-        //    await Task.CompletedTask;
-        //    return Ok();
-        //}
+        [HttpGet("{id}")]
+        public LibrosME? ObtenerLibroPorId(Guid idLibro)
+        {
+            LibrosME? libro = null;
 
-        //[HttpPost]
-        //public async Task<IActionResult> Crear()
-        //{
+            try
+            {
+                libro = _dbContext.LibrosME.FirstOrDefault(l => l.IDLibro == idLibro);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
 
-        //    await Task.CompletedTask;
-        //    return Ok();
-        //}
+            return libro;
+        }
 
-        //[HttpPut]
-        //public async Task<IActionResult> Actualizar()
-        //{
-        //    await Task.CompletedTask;
-        //    return Ok();
-        //}
+        [HttpGet("Tematica")]
+        public LibrosME? ObtenerLibroPorTematica(string tematica)
+        {
+            LibrosME? libro = null;
 
-        //[HttpDelete]
-        //public async Task<IActionResult> Borrar()
-        //{
-        //    await Task.CompletedTask;
-        //    return Ok();
-        //}
+            try
+            {
+                libro = _dbContext.LibrosME.FirstOrDefault(l => l.Tematica == tematica);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+
+            return libro;
+        }
+
+        [HttpGet("Fecha")]
+        public LibrosME? ObtenerLibroPorFecha(DateTime fecha)
+        {
+            LibrosME? libro = null;
+
+            try
+            {
+                DateTime fechaSinHora = fecha.Date;
+
+                libro = _dbContext.LibrosME.FirstOrDefault(l => l.FechaRegistro.Date == fechaSinHora);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+
+            return libro;
+        }
+
+        [HttpGet("Disponible")]
+        public LibrosME? ObteneEstatusLibros(bool disponible)
+        {
+            LibrosME? libro = null;
+
+            try
+            {
+                libro = _dbContext.LibrosME.FirstOrDefault(l => l.Disponible == disponible);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+
+            return libro;
+        }
+
+
+        [HttpPost]
+        public IActionResult CrearRegistroLibro([FromBody] LibrosME libro)
+        {
+            try
+            {
+                _dbContext.LibrosME.Add(libro);
+                _dbContext.SaveChanges();
+
+                return Ok("Libro ingresado exitosamente");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                return StatusCode(500, $"Error al crear el libro: {ex.Message}");
+            }
+        }
+
+        [HttpPut("{id}")]
+        public IActionResult ActualizarRegistroLibro([FromBody] LibrosME libro, Guid id )
+        {
+            try
+            {
+                var libroExistente = _dbContext.LibrosME.FirstOrDefault(l => l.IDLibro == id);
+
+                if (libroExistente == null)
+                {
+                    return NotFound("Libro no encontrado");
+                }
+
+                libroExistente.NombreAutor = libro.NombreAutor;
+                libroExistente.ApellidoAutor = libro.ApellidoAutor;
+                libroExistente.Tematica = libro.Tematica;
+                libroExistente.TituloLibro = libro.TituloLibro;
+                libroExistente.Lugar = libro.Lugar;
+                libroExistente.Editorial = libro.Editorial;
+                libroExistente.Disponible = libro.Disponible;
+
+                _dbContext.SaveChanges();
+
+                return Ok("Libro actualizado exitosamente");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                return StatusCode(500, $"Error al actualizar el libro: {ex.Message}");
+            }
+        }
+
+        [HttpDelete("{id}")]
+        public IActionResult EliminarRegistroLibro(Guid id)
+        {
+            try
+            {
+                var libroExistente = _dbContext.LibrosME.FirstOrDefault(l => l.IDLibro == id);
+
+                if (libroExistente == null)
+                {
+                    return NotFound("Libro no encontrado");
+                }
+
+                _dbContext.LibrosME.Remove(libroExistente);
+                _dbContext.SaveChanges();
+
+                return Ok("Libro eliminado exitosamente");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                return StatusCode(500, $"Error al eliminar el libro: {ex.Message}");
+            }
+        }
     }
 }

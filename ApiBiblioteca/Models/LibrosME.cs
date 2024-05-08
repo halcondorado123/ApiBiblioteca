@@ -6,13 +6,20 @@ namespace ApiBiblioteca.Models
     public class LibrosME
     {
         [Key]
+        [Required]
         public Guid IDLibro { get; set; }
+        [Required]
+        public DateTime FechaRegistro { get; set; }
+        [Required]
         public string? NombreAutor { get; set; }
+        [Required]
         public string? ApellidoAutor { get; set; }
         public string? Tematica { get; set; }
+        [Required]
         public string? TituloLibro { get; set; }
         public string? Lugar { get; set; }
         public string? Editorial { get; set; }
+        [Required]
         public bool Disponible { get; set; }
 
     }

@@ -29,6 +29,7 @@ namespace ApiBiblioteca.Migrations
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("ApellidoAutor")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("Disponible")
@@ -37,16 +38,21 @@ namespace ApiBiblioteca.Migrations
                     b.Property<string>("Editorial")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<DateTime>("FechaRegistro")
+                        .HasColumnType("datetime2");
+
                     b.Property<string>("Lugar")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("NombreAutor")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Tematica")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("TituloLibro")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("IDLibro");
