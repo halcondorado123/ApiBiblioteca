@@ -1,5 +1,6 @@
 ﻿using ApiBiblioteca.Data;
 using ApiBiblioteca.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -15,7 +16,7 @@ namespace ApiBiblioteca.Controllers
         {
             _dbContext = dbContext;
         }
-
+        [Authorize]
         [HttpGet("Libros")]
         public List<LibrosME> ObtenerLibros()
         {
@@ -33,7 +34,7 @@ namespace ApiBiblioteca.Controllers
             return libros;
         }
 
-
+        [Authorize]
         [HttpGet("{id}")]
         public LibrosME? ObtenerLibroPorId(Guid idLibro)
         {
@@ -50,7 +51,7 @@ namespace ApiBiblioteca.Controllers
 
             return libro;
         }
-
+        [Authorize]
         [HttpGet("Tematica")]
         public LibrosME? ObtenerLibroPorTematica(string tematica)
         {
@@ -67,7 +68,7 @@ namespace ApiBiblioteca.Controllers
 
             return libro;
         }
-
+        [Authorize]
         [HttpGet("Fecha")]
         public LibrosME? ObtenerLibroPorFecha(DateTime fecha)
         {
@@ -86,7 +87,7 @@ namespace ApiBiblioteca.Controllers
 
             return libro;
         }
-
+        [Authorize]
         [HttpGet("Disponible")]
         public LibrosME? ObteneEstatusLibros(bool disponible)
         {
@@ -104,7 +105,7 @@ namespace ApiBiblioteca.Controllers
             return libro;
         }
 
-
+        [Authorize]
         [HttpPost]
         public IActionResult CrearRegistroLibro([FromBody] LibrosME libro)
         {
@@ -122,6 +123,7 @@ namespace ApiBiblioteca.Controllers
             }
         }
 
+        [Authorize]
         [HttpPut("{id}")]
         public IActionResult ActualizarRegistroLibro([FromBody] LibrosME libro, Guid id )
         {
@@ -153,6 +155,7 @@ namespace ApiBiblioteca.Controllers
             }
         }
 
+        [Authorize]
         [HttpDelete("{id}")]
         public IActionResult EliminarRegistroLibro(Guid id)
         {

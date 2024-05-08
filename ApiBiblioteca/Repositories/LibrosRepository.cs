@@ -50,6 +50,32 @@ namespace ApiBiblioteca.Repositories
                 throw;
             }
         }
+
+        public Task<LibrosME> ObtenerPorFechas(DateTime fecha)
+        {
+            try
+            {
+                return _dbContext.LibrosME.FirstOrDefaultAsync(l => l.FechaRegistro == fecha);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                throw;
+            }
+        }
+        public Task<LibrosME> ObtenerPorDisponibilidad(bool disponible)
+        {
+            try
+            {
+                return _dbContext.LibrosME.FirstOrDefaultAsync(l => l.Disponible == disponible);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                throw;
+            }
+        }
+
         public async Task CrearRegistroLibro(LibrosME libro)
         {
             try
