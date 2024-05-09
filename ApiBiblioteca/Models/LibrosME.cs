@@ -22,6 +22,7 @@ namespace ApiBiblioteca.Models
         [Required]
         public bool Disponible { get; set; }
 
+
     }
 
     // Contexto de datos

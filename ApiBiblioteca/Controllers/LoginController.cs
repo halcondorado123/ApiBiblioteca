@@ -1,8 +1,10 @@
 ﻿using ApiBiblioteca.Constants;
 using ApiBiblioteca.Models;
+using Azure;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
+using System.Globalization;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
@@ -15,14 +17,21 @@ namespace ApiBiblioteca.Controllers
     {
         private readonly IConfiguration? _configuration;
 
-        public LoginController(IConfiguration? configuration)
+        private readonly ILogger<LoginController> _logger;
+
+        public LoginController(IConfiguration? configuration, ILogger<LoginController> logger)
         {
             _configuration = configuration;
+            _logger = logger;
         }
 
         [HttpPost]
-        public IActionResult Login(LoginUser userLogin)
+        public IActionResult Login([FromBody] LoginUser userLogin)
         {
+            _logger.LogDebug("Metodo Login iniciado");
+
+            IActionResult response = Unauthorized();
+
             var user = Autenticar(userLogin);
 
             if (user != null)
@@ -30,24 +39,31 @@ namespace ApiBiblioteca.Controllers
                 // Crear token
                 var token = GenerarToken(user);
 
-                return Ok("Usuario logeado exitosamente, el token generado es:" + token);
+                response = Ok(new { Token = token });
             }
-            return NotFound("Usuario no encontrado");
+            return response;
         }
 
         private UserModel? Autenticar(LoginUser? userLogin)
         {
+            _logger.LogDebug("Metodo Autenticar iniciado");
+
             var usuarioActual = UserConstants.Usuarios.FirstOrDefault(u => u.UserName?.ToLower() == userLogin?.UserName?.ToLower() && u.Password == userLogin?.Password);
 
             if (usuarioActual != null)
             {
+                _logger.LogInformation("La autenticación fue exitosa");
                 return usuarioActual;
             }
+            _logger.LogWarning("La autenticación fue nula");
             return null;
         }
 
         private string? GenerarToken(UserModel usuario)
         {
+            _logger.LogDebug("Metodo GenerarToken iniciado");
+
+            DateTime time = DateTime.Now;
 
             var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]));
             var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
@@ -64,9 +80,10 @@ namespace ApiBiblioteca.Controllers
                 _configuration?["Jwt:Issuer"],
                 _configuration?["Jwt:Audience"],
                 claims,
-                expires: DateTime.UtcNow.AddMinutes(15),
+                expires: time.AddHours(6).AddMinutes(20),
                 signingCredentials: credentials);
 
+            _logger.LogInformation("Se ha generado el token exitosamente");
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
     }
